@@ -1,13 +1,14 @@
 # coding=utf-8
 # Created by Meteorix at 2019/8/9
-from gevent import monkey; monkey.patch_all()
 from flask import Flask, jsonify, request
-from model import batch_prediction
+from gevent import monkey
+
 from service_streamer import ThreadedStreamer
+from .model import batch_predict
 
-
+monkey.patch_all()
 app = Flask(__name__)
-streamer = ThreadedStreamer(batch_prediction, batch_size=64)
+streamer = ThreadedStreamer(batch_predict, batch_size=64)
 
 
 @app.route('/predict', methods=['POST'])
@@ -21,4 +22,5 @@ def predict():
 
 if __name__ == "__main__":
     from gevent.pywsgi import WSGIServer
+
     WSGIServer(("0.0.0.0", 5005), app).serve_forever()
